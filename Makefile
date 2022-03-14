@@ -47,6 +47,17 @@ manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and Cust
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
+.PHONY: gen-deepcopy
+gen-deepcopy: deepcopy-gen ## Generate code for deepcopy, same as "generate target"
+	$(DEEPCOPY_GEN) --go-header-file hack/boilerplate.go.txt --input-dirs=api/v1 --output-package=api/v1 --output-file-base=zz_generated.deepcopy
+
+.PHONY: gen-register
+gen-register: register-gen ## Generate code for register
+	$(REGISTER_GEN) --go-header-file hack/boilerplate.go.txt --input-dirs=api/v1 --output-package=api/v1 --output-file-base=zz_generated.register
+.PHONY: gen-client
+gen-client: client-gen ## Generate code for client
+	$(CLIENT_GEN) --go-header-file hack/boilerplate.go.txt --input-base="" --input-dirs=api/v1 --output-package=pkg/generated/clientset  --clientset-name=versioned
+
 .PHONY: fmt
 fmt: ## Run go fmt against code.
 	go fmt ./...
@@ -114,6 +125,21 @@ ENVTEST = $(shell pwd)/bin/setup-envtest
 .PHONY: envtest
 envtest: ## Download envtest-setup locally if necessary.
 	$(call go-get-tool,$(ENVTEST),sigs.k8s.io/controller-runtime/tools/setup-envtest@latest)
+
+DEEPCOPY_GEN = $(shell pwd)/bin/deepcopy-gen
+.PHONY: deepcopy-gen
+deepcopy-gen: ## Download deepcopy-gen locally if necessary.
+	$(call go-get-tool,$(DEEPCOPY_GEN),k8s.io/code-generator/cmd/deepcopy-gen@latest)
+
+REGISTER_GEN = $(shell pwd)/bin/register-gen
+.PHONY: register-gen
+register-gen: ## Download register-gen locally if necessary.
+	$(call go-get-tool,$(REGISTER_GEN),k8s.io/code-generator/cmd/register-gen@latest)
+
+CLIENT_GEN = $(shell pwd)/bin/client-gen
+.PHONY: client-gen
+client-gen: ##  Download client-gen locally if necessary.
+	$(call go-get-tool,$(CLIENT_GEN),k8s.io/code-generator/cmd/client-gen@latest)
 
 # go-get-tool will 'go get' any package $2 and install it to $1.
 PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
