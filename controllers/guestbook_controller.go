@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"k8s.io/apimachinery/pkg/api/errors"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -47,9 +48,18 @@ type GuestbookReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.0/pkg/reconcile
 func (r *GuestbookReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	ReconcilerLog := log.FromContext(ctx)
 
 	// TODO(user): your logic here
+	guestBook := webappv1.Guestbook{}
+	err := r.Get(ctx,req.NamespacedName,&guestBook)
+
+	if err != nil{
+		if errors.IsNotFound(err){
+			ReconcilerLog.Info("Guestbook crd object not found",err)
+		}
+		return ctrl.Result{}, err
+	}
 
 	return ctrl.Result{}, nil
 }
