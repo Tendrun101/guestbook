@@ -56,7 +56,7 @@ gen-register: register-gen ## Generate code for register
 	$(REGISTER_GEN) --go-header-file hack/boilerplate.go.txt --input-dirs=api/v1 --output-package=api/v1 --output-file-base=zz_generated.register
 .PHONY: gen-client
 gen-client: client-gen ## Generate code for client
-	$(CLIENT_GEN) --go-header-file hack/boilerplate.go.txt --input-base="" --input-dirs=api/v1 --output-package=pkg/generated/clientset  --clientset-name=versioned
+	$(CLIENT_GEN) --go-header-file hack/boilerplate.go.txt --input-base="" --input-dirs=api/v1 --output-package=pkg/generated/clientset  --clientset-name=v1
 
 .PHONY: fmt
 fmt: ## Run go fmt against code.
